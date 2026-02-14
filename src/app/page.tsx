@@ -5,27 +5,48 @@ import { Button } from '@/components/ui/button'
 import { Building2, FileText, Scale, ArrowRight, Shield } from 'lucide-react'
 
 export default async function Dashboard() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  let recentPlans: any[] = []
+  let recentComparisons: any[] = []
+  let errorMsg = null
 
-  let recentPlans = []
-  let recentComparisons = []
+  try {
+    const supabase = await createClient()
+    const authResult = await supabase.auth.getUser()
+    user = authResult.data.user
 
-  if (user) {
-    const { data: plans } = await supabase
-      .from('plans')
-      .select('*')
-      .eq('created_by', user.id)
-      .order('created_at', { ascending: false })
-      .limit(3)
-    recentPlans = plans || []
+    if (user) {
+      const { data: plans } = await supabase
+        .from('plans')
+        .select('*')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false })
+        .limit(3)
+      recentPlans = plans || []
 
-    const { data: comps } = await supabase
-      .from('comparisons')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(3)
-    recentComparisons = comps || []
+      const { data: comps } = await supabase
+        .from('comparisons')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3)
+      recentComparisons = comps || []
+    }
+  } catch (e: any) {
+    console.error("Dashboard Error:", e)
+    errorMsg = e.message || "Unknown error"
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="container mx-auto py-20 px-4 text-center">
+        <h1 className="text-2xl font-bold text-red-600 mb-4">System configuration required</h1>
+        <p className="mb-4">The application could not connect to the backend services.</p>
+        <div className="bg-gray-100 p-4 rounded-md inline-block text-left mb-6 font-mono text-sm border border-gray-300">
+          {errorMsg}
+        </div>
+        <p className="text-gray-500 text-sm">Please check your Vercel Environment Variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY).</p>
+      </div>
+    )
   }
 
   return (
