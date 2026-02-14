@@ -3,9 +3,9 @@ import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import { AddRiderDialog } from '../add-rider-dialog'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, ExternalLink, Trash2 } from 'lucide-react'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { deleteRider } from '../actions'
 
 // Need to define params type for Next.js 15
@@ -62,37 +62,44 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                         <p className="text-gray-500">No riders added yet.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {riders?.map((rider) => (
-                            <Card key={rider.id}>
-                                <CardHeader className="pb-2">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <Badge variant="secondary" className="mb-2 capitalize">{rider.category}</Badge>
-                                            <CardTitle className="text-lg">{rider.name}</CardTitle>
-                                        </div>
-                                        <form action={deleteRider.bind(null, rider.id, company.id)}>
-                                            <Button variant="ghost" size="icon-xs" className="text-gray-400 hover:text-red-500">
-                                                <Trash2 className="h-3 w-3" />
-                                            </Button>
-                                        </form>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="text-sm space-y-2">
-                                    {rider.summary && (
-                                        <p className="text-gray-700"><strong>Summary:</strong> {rider.summary}</p>
-                                    )}
-                                    {rider.notes && (
-                                        <p className="text-gray-500"><strong>Notes:</strong> {rider.notes}</p>
-                                    )}
-                                    {rider.source_url && (
-                                        <a href={rider.source_url} target="_blank" className="text-blue-500 hover:underline text-xs flex items-center gap-1 mt-2">
-                                            Source <ExternalLink className="h-3 w-3" />
-                                        </a>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        ))}
+                    <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="bg-gray-100/50">
+                                    <TableHead className="w-[150px]">Category</TableHead>
+                                    <TableHead className="w-[200px]">Rider Name</TableHead>
+                                    <TableHead>Summary</TableHead>
+                                    <TableHead>Notes</TableHead>
+                                    <TableHead className="w-[100px] text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {riders?.map((rider) => (
+                                    <TableRow key={rider.id}>
+                                        <TableCell>
+                                            <Badge variant="outline" className="capitalize">{rider.category}</Badge>
+                                        </TableCell>
+                                        <TableCell className="font-medium">
+                                            {rider.name}
+                                            {rider.source_url && (
+                                                <a href={rider.source_url} target="_blank" className="ml-2 inline-block text-blue-500 hover:text-blue-700">
+                                                    <ExternalLink className="h-3 w-3" />
+                                                </a>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-gray-600 font-light text-sm">{rider.summary}</TableCell>
+                                        <TableCell className="text-gray-500 text-xs">{rider.notes}</TableCell>
+                                        <TableCell className="text-right">
+                                            <form action={deleteRider.bind(null, rider.id, company.id)}>
+                                                <Button variant="ghost" size="icon-sm" className="text-gray-400 hover:text-red-500 bg-transparent hover:bg-transparent p-0 h-auto">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </form>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </div>
                 )}
             </div>

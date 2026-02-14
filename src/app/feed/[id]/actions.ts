@@ -24,9 +24,9 @@ export async function updateComparisonItem(itemId: string, formData: FormData) {
     const supabase = await createClient()
 
     const updates: Record<string, any> = {}
-    if (formData.has('pros')) updates.pros = formData.get('pros')
-    if (formData.has('cons')) updates.cons = formData.get('cons')
-    if (formData.has('rationale')) updates.rationale = formData.get('rationale')
+    if (formData.has('pros')) updates.pros = formData.get('pros') as string
+    if (formData.has('cons')) updates.cons = formData.get('cons') as string
+    if (formData.has('rationale')) updates.rationale = formData.get('rationale') as string
 
     if (Object.keys(updates).length === 0) return
 

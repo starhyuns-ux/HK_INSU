@@ -3,19 +3,30 @@
 import { useState } from 'react'
 import { createRider } from './actions'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogFooter
 } from '@/components/ui/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { PlusCircle } from 'lucide-react'
+
+const CATEGORIES = [
+    { value: 'cancer', label: 'Cancer' },
+    { value: 'brain_heart', label: 'Brain/Heart' },
+    { value: 'injury', label: 'Injury' },
+    { value: 'surgery', label: 'Surgery' },
+    { value: 'hospitalization', label: 'Hospitalization' },
+    { value: 'driver', label: 'Driver' },
+    { value: 'dementia', label: 'Dementia' },
+    { value: 'other', label: 'Other' },
+]
 
 export function AddRiderDialog({ companyId }: { companyId: string }) {
     const [open, setOpen] = useState(false)
@@ -23,58 +34,49 @@ export function AddRiderDialog({ companyId }: { companyId: string }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Add Rider</Button>
+                <Button className="gap-2"><PlusCircle className="h-4 w-4" /> Add Rider</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Add New Rider</DialogTitle>
-                    <DialogDescription>
-                        Add a specific rider/contract to this company.
-                    </DialogDescription>
                 </DialogHeader>
-                <form
-                    action={async (formData) => {
-                        await createRider(companyId, formData)
-                        setOpen(false)
-                    }}
-                    className="grid gap-4 py-4"
-                >
+                <form action={async (formData) => {
+                    await createRider(companyId, formData)
+                    setOpen(false)
+                }} className="space-y-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="name" className="text-right">Name</Label>
                         <Input id="name" name="name" className="col-span-3" required placeholder="e.g. Cancer Care 100" />
                     </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="category" className="text-right">Category</Label>
                         <div className="col-span-3">
-                            <Select name="category" required>
+                            <Select name="category" defaultValue="other">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select category" />
+                                    <SelectValue placeholder="Select Category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="cancer">Cancer</SelectItem>
-                                    <SelectItem value="brain_heart">Brain/Heart</SelectItem>
-                                    <SelectItem value="surgery">Surgery</SelectItem>
-                                    <SelectItem value="hospitalization">Hospitalization</SelectItem>
-                                    <SelectItem value="accident">Accident/Injury</SelectItem>
-                                    <SelectItem value="dental">Dental</SelectItem>
-                                    <SelectItem value="dementia">Dementia/Nursing</SelectItem>
-                                    <SelectItem value="driver">Driver/Cost</SelectItem>
-                                    <SelectItem value="child">Child/Prenatal</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
+                                    {CATEGORIES.map(cat => (
+                                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="summary" className="text-right">Summary</Label>
-                        <Textarea id="summary" name="summary" className="col-span-3" placeholder="Brief coverage summary..." />
+                        <Textarea id="summary" name="summary" className="col-span-3" placeholder="Brief description of coverage..." />
                     </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="notes" className="text-right">Notes/Exclusions</Label>
-                        <Textarea id="notes" name="notes" className="col-span-3" placeholder="Exclusions, reduction periods..." />
+                        <Label htmlFor="notes" className="text-right">Notes</Label>
+                        <Textarea id="notes" name="notes" className="col-span-3" placeholder="Exclusions, waiting periods, etc." />
                     </div>
+
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="source_url" className="text-right">Source URL</Label>
+                        <Label htmlFor="source_url" className="text-right">URL</Label>
                         <Input id="source_url" name="source_url" className="col-span-3" placeholder="https://..." />
                     </div>
 
